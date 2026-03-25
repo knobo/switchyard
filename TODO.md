@@ -1,0 +1,2 @@
+- [ ] Generate app icon using local AI Flux model
+- [ ] Add icon to .desktop file and install
