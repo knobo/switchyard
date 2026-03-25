@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Name=HTML Dispatch
+GenericName=URL Dispatcher
+Comment=URL dispatcher - routes URLs to the right browser and profile
+Exec=htmldispatch %u
+Terminal=false
+Type=Application
+Categories=Network;WebBrowser;
+MimeType=x-scheme-handler/http;x-scheme-handler/https;
+Icon=web-browser
+StartupNotify=false

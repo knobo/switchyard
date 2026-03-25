@@ -1,0 +1,16 @@
+[project]
+name = "htmldispatch"
+version = "0.1.0"
+description = "URL dispatcher for Linux - routes URLs to the right browser and profile"
+requires-python = ">=3.10"
+dependencies = [
+    "ttkbootstrap",
+    "pyyaml",
+]
+
+[project.scripts]
+htmldispatch = "htmldispatch.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
