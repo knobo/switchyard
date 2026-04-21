@@ -10,18 +10,21 @@ BIN_LINK="$HOME/.local/bin/htmldispatch"
 cd "$SCRIPT_DIR"
 uv sync
 
-# Create a wrapper script that uses uv run
+# Create a wrapper that calls the venv binary directly, so it works from
+# processes with a minimal PATH (e.g. Slack/Electron) that don't have
+# ~/.local/bin or uv/pyenv on PATH.
 cat > "$BIN_LINK" << WRAPPER
 #!/bin/bash
-cd "$SCRIPT_DIR"
-exec uv run htmldispatch "\$@"
+exec "$SCRIPT_DIR/.venv/bin/htmldispatch" "\$@"
 WRAPPER
 chmod +x "$BIN_LINK"
 
 echo "Installed $BIN_LINK"
 
-# Install desktop file
-install -m 644 "$SCRIPT_DIR/$DESKTOP_FILE" "$DESKTOP_DEST"
+# Install desktop file with absolute path to the wrapper so apps whose
+# PATH lacks ~/.local/bin (e.g. Slack/Electron) can still launch it.
+sed "s|^Exec=htmldispatch |Exec=$BIN_LINK |" "$SCRIPT_DIR/$DESKTOP_FILE" > "$DESKTOP_DEST"
+chmod 644 "$DESKTOP_DEST"
 
 echo "Installed $DESKTOP_DEST"
 
