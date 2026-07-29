@@ -35,7 +35,8 @@ This will:
 1. Install dependencies in a local `.venv`
 2. Create a wrapper script at `~/.local/bin/switchyard`
 3. Install the `.desktop` file
-4. Set switchyard as the default URL handler for `http://` and `https://`
+4. Install the app icon into `~/.local/share/icons/hicolor`
+5. Set switchyard as the default URL handler for `http://` and `https://`
 
 ## Usage
 
@@ -208,7 +209,9 @@ xdg-open https://example.com
 ```bash
 rm ~/.local/bin/switchyard
 rm ~/.local/share/applications/switchyard.desktop
+rm ~/.local/share/icons/hicolor/*/apps/switchyard.*
 update-desktop-database ~/.local/share/applications
+gtk-update-icon-cache -f -t ~/.local/share/icons/hicolor
 xdg-settings set default-web-browser firefox.desktop
 ```
 

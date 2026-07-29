@@ -8,5 +8,5 @@ Terminal=false
 Type=Application
 Categories=Network;WebBrowser;
 MimeType=x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/claude;x-scheme-handler/about;x-scheme-handler/unknown;text/html;
-Icon=web-browser
+Icon=switchyard
 StartupNotify=false

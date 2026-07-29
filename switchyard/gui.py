@@ -51,6 +51,26 @@ def suggest_pattern(url):
     return f"{base}/{re.escape(first)}" if first else base
 
 
+ICON_RELATIVE_PATH = "hicolor/128x128/apps/switchyard.png"
+ICON_SEARCH_DIRS = [
+    Path.home() / ".local/share/icons",
+    Path(__file__).resolve().parent.parent / "icons",
+]
+
+
+def set_window_icon(window):
+    """Give the window our own icon in the taskbar and alt-tab switcher."""
+    for base in ICON_SEARCH_DIRS:
+        icon = base / ICON_RELATIVE_PATH
+        if icon.exists():
+            try:
+                window._icon_image = tk.PhotoImage(file=str(icon))
+                window.iconphoto(True, window._icon_image)
+            except tk.TclError:
+                pass
+            return
+
+
 def profiles_for_browser(browser):
     """Profile choices for a browser. Claude always names one, so it gets no "(none)"."""
     if browser == "claude":
@@ -79,6 +99,7 @@ class DispatcherApp:
             self.root.style.theme_use(self.config.get("theme", "darkly"))
         except tk.TclError:
             pass  # theme from config no longer exists; keep darkly
+        set_window_icon(self.root)
 
         self.notebook = ttk.Notebook(self.root)
         self.notebook.pack(fill=BOTH, expand=True, padx=10, pady=10)
