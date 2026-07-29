@@ -8,6 +8,7 @@ BIN_LINK="$HOME/.local/bin/switchyard"
 
 # Remove the install from when this app was called htmldispatch
 rm -f "$HOME/.local/bin/htmldispatch" "$HOME/.local/share/applications/htmldispatch.desktop"
+rm -f "$HOME"/.local/share/icons/hicolor/*/apps/htmldispatch.*
 
 # Install as editable with uv
 cd "$SCRIPT_DIR"
@@ -23,6 +24,14 @@ WRAPPER
 chmod +x "$BIN_LINK"
 
 echo "Installed $BIN_LINK"
+
+# Install the app icon into the user icon theme (Icon=switchyard resolves here)
+ICON_DEST="$HOME/.local/share/icons/hicolor"
+mkdir -p "$ICON_DEST"
+cp -r "$SCRIPT_DIR/icons/hicolor/." "$ICON_DEST/"
+gtk-update-icon-cache -f -t "$ICON_DEST" 2>/dev/null || true
+
+echo "Installed icons in $ICON_DEST"
 
 # Install desktop file with absolute path to the wrapper so apps whose
 # PATH lacks ~/.local/bin (e.g. Slack/Electron) can still launch it.
