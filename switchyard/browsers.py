@@ -10,6 +10,8 @@ FIREFOX_PROFILE_DIRS = [
     Path.home() / ".mozilla/firefox",
 ]
 
+CLAUDE_DESKTOP_CMD = "claude-desktop"
+
 
 def get_firefox_profiles():
     """Return list of Firefox profile names."""
@@ -89,12 +91,45 @@ def get_chrome_profiles():
     return profiles
 
 
+def discover_claude_profiles():
+    """Derive Claude Desktop profiles from ~/.config/Claude-<name> directories.
+
+    Used when the config file has no claude_profiles section. "default" is the
+    app's built-in profile (~/.config/Claude), so it needs no overrides.
+    """
+    profiles = {"default": {}}
+    for user_data_dir in sorted((Path.home() / ".config").glob("Claude-*")):
+        if not user_data_dir.is_dir():
+            continue
+        name = user_data_dir.name[len("Claude-") :]
+        entry = {"user_data_dir": str(user_data_dir)}
+        config_dir = Path.home() / f".claude-{name}"
+        if config_dir.is_dir():
+            entry["config_dir"] = str(config_dir)
+        profiles[name] = entry
+    return profiles
+
+
+def get_claude_profile_map():
+    """Return dict of Claude profile name -> {user_data_dir, config_dir}."""
+    from .config import load_config
+
+    configured = load_config().get("claude_profiles")
+    return configured if configured else discover_claude_profiles()
+
+
+def get_claude_profiles():
+    """Return list of Claude Desktop profile names."""
+    return list(get_claude_profile_map().keys())
+
+
 def get_available_browsers():
     """Return dict of browser name -> path."""
     browsers = {}
     for name, cmds in [
         ("firefox", ["firefox"]),
         ("chrome", ["google-chrome", "chromium-browser", "chromium"]),
+        ("claude", [CLAUDE_DESKTOP_CMD]),
     ]:
         for cmd in cmds:
             if shutil.which(cmd):

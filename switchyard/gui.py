@@ -12,6 +12,7 @@ from .browsers import (
     get_available_browsers,
     get_chrome_profile_names,
     get_chrome_profiles,
+    get_claude_profiles,
     get_firefox_profiles,
 )
 from .config import load_config, save_config
@@ -43,9 +44,24 @@ def find_browser_icon(browser, size=32):
 def suggest_pattern(url):
     """Suggest a rule regex from the URL's host and first path segment."""
     parsed = urlparse(url)
-    base = rf"https?://{re.escape(parsed.netloc)}"
+    # http and https are interchangeable; any other scheme is matched as-is
+    scheme = "https?" if parsed.scheme in ("http", "https") else re.escape(parsed.scheme)
+    base = rf"{scheme}://{re.escape(parsed.netloc)}"
     first = parsed.path.strip("/").split("/")[0]
     return f"{base}/{re.escape(first)}" if first else base
+
+
+def profiles_for_browser(browser):
+    """Profile choices for a browser. Claude always names one, so it gets no "(none)"."""
+    if browser == "claude":
+        return get_claude_profiles()
+    if browser == "firefox":
+        profiles = get_firefox_profiles()
+    elif browser == "chrome":
+        profiles = get_chrome_profiles()
+    else:
+        profiles = []
+    return ["(none)"] + profiles
 
 
 class DispatcherApp:
@@ -258,14 +274,17 @@ class DispatcherApp:
                 browsers.append(browser)
 
         for n, browser in enumerate(browsers):
-            if browser == "firefox":
+            if browser == "claude":
+                profiles = get_claude_profiles()
+            elif browser == "firefox":
                 profiles = get_firefox_profiles()
             elif browser == "chrome":
                 profiles = get_chrome_profiles()
             else:
                 profiles = []
             profiles += [p for b, p in extra if b == browser and p and p not in profiles]
-            profiles.append(None)
+            if browser != "claude":  # Claude always names a profile
+                profiles.append(None)
             color = self._browser_color(browser)
 
             if n:
@@ -874,14 +893,7 @@ class RuleDialog:
         self._update_profiles()
 
     def _update_profiles(self):
-        browser = self.browser_var.get()
-        if browser == "firefox":
-            profiles = get_firefox_profiles()
-        elif browser == "chrome":
-            profiles = get_chrome_profiles()
-        else:
-            profiles = []
-        profiles = ["(none)"] + profiles
+        profiles = profiles_for_browser(self.browser_var.get())
         self.profile_combo.configure(values=profiles)
         current = self.profile_var.get()
         if current not in profiles:

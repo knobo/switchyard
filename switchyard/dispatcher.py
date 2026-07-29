@@ -1,7 +1,9 @@
+import os
 import re
 import subprocess
+from pathlib import Path
 
-from .browsers import get_firefox_profile_path
+from .browsers import CLAUDE_DESKTOP_CMD, get_claude_profile_map, get_firefox_profile_path
 from .config import load_config
 from .history import (
     add_entry,
@@ -57,12 +59,42 @@ def resolve_destination(url):
 
 def open_url(url, browser, profile=None, rule_name=None):
     cmd = build_command(browser, profile, url)
-    subprocess.Popen(cmd)
+    subprocess.Popen(cmd, env=build_env(browser, profile))
     add_entry(url, browser, profile, rule_name)
 
 
+def build_env(browser, profile):
+    """Return the environment for the child process, or None to inherit ours.
+
+    Claude Desktop keeps each profile in its own userData directory, selected by
+    CLAUDE_USER_DATA_DIR — that also gives it a separate Electron singleton lock,
+    so several profiles can run side by side. CLAUDE_CONFIG_DIR points the
+    embedded Claude Code at the matching ~/.claude* directory.
+    """
+    if browser != "claude":
+        return None
+    settings = get_claude_profile_map().get(profile) or {}
+    # Drop any inherited values first, so a profile without overrides ("default")
+    # always lands on Claude's own directories instead of whatever we were started with.
+    env = {
+        k: v
+        for k, v in os.environ.items()
+        if k not in ("CLAUDE_USER_DATA_DIR", "CLAUDE_CONFIG_DIR")
+    }
+    for key, env_var in [
+        ("user_data_dir", "CLAUDE_USER_DATA_DIR"),
+        ("config_dir", "CLAUDE_CONFIG_DIR"),
+    ]:
+        value = settings.get(key)
+        if value:
+            env[env_var] = str(Path(value).expanduser())
+    return env
+
+
 def build_command(browser, profile, url):
-    if browser == "firefox":
+    if browser == "claude":
+        return [CLAUDE_DESKTOP_CMD, url]
+    elif browser == "firefox":
         cmd = ["firefox"]
         if profile:
             profile_path = get_firefox_profile_path(profile)

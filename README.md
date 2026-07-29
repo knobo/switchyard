@@ -11,6 +11,7 @@ Instead of opening every link in the same browser, switchyard lets you automatic
 - **Regexp-based URL routing** — match URLs with regex patterns and dispatch to specific browsers and profiles
 - **Firefox multi-profile support** — opens URLs directly in the correct Firefox profile using `--profile`
 - **Chrome profile support** — route to specific Chrome profile directories
+- **Claude Desktop profile support** — pick which Claude Desktop profile a `claude://` deep link opens in
 - **Smart fallback chain** — when no rule matches: exact URL history → domain history → last used → default
 - **Intercept mode** — optionally show a popup for unmatched URLs to choose the destination
 - **Arrow key navigation** — press Up/Down to cycle through previously used browser/profile combinations
@@ -86,11 +87,39 @@ Each rule has:
 |-------|-------------|
 | `name` | Display name for the rule |
 | `pattern` | Python regex matched against the full URL |
-| `browser` | `firefox` or `chrome` |
-| `profile` | Firefox profile name, Chrome profile directory, or `null` |
+| `browser` | `firefox`, `chrome` or `claude` |
+| `profile` | Firefox profile name, Chrome profile directory, Claude profile name, or `null` |
 | `confirm` | If `true`, always show the popup for manual confirmation before opening |
 
 Rules are evaluated top-to-bottom — first match wins.
+
+### Claude Desktop profiles
+
+Claude Desktop keeps each account in its own userData directory, chosen with the
+`CLAUDE_USER_DATA_DIR` environment variable. Because Electron's singleton lock lives in
+that directory, several profiles can run side by side. `CLAUDE_CONFIG_DIR` points the
+embedded Claude Code at the matching config directory.
+
+A `claude://` deep link carries no hint about which browser profile you clicked it from,
+so there is nothing to write a regex against. Instead, install a `confirm` rule and let
+the popup ask — arrow keys cycle through the profiles you have used before:
+
+```yaml
+claude_profiles:
+  default: {}                              # the app's own profile (~/.config/Claude)
+  entur:
+    user_data_dir: ~/.config/Claude-entur
+    config_dir: ~/.claude-entur
+rules:
+- name: Claude Desktop
+  pattern: ^claude://
+  browser: claude
+  profile: default
+  confirm: true
+```
+
+Leave out `claude_profiles` entirely and profiles are auto-discovered from
+`~/.config/Claude-<name>` directories, pairing each with `~/.claude-<name>` if it exists.
 
 ### Dispatch logic
 

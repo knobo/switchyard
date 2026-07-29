@@ -39,6 +39,12 @@ xdg-settings set default-web-browser "$DESKTOP_FILE" 2>/dev/null || true
 xdg-mime default "$DESKTOP_FILE" x-scheme-handler/http 2>/dev/null || true
 xdg-mime default "$DESKTOP_FILE" x-scheme-handler/https 2>/dev/null || true
 
+# claude:// deep links carry no hint about which browser profile you clicked
+# them from, so route them through the dispatcher to pick a Claude profile.
+if command -v claude-desktop >/dev/null 2>&1; then
+    xdg-mime default "$DESKTOP_FILE" x-scheme-handler/claude 2>/dev/null || true
+fi
+
 echo ""
 echo "switchyard is now the default web browser/URL handler."
 echo ""
