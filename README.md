@@ -1,10 +1,10 @@
-# htmldispatch
+# switchyard
 
 A URL dispatcher for Linux that routes URLs to the right browser and profile based on regexp rules.
 
-Instead of opening every link in the same browser, htmldispatch lets you automatically send GitHub URLs to Firefox with your work profile, Teams links to Chrome, and so on — all configurable with regex patterns.
+Instead of opening every link in the same browser, switchyard lets you automatically send GitHub URLs to Firefox with your work profile, Teams links to Chrome, and so on — all configurable with regex patterns.
 
-![htmldispatch screenshot](screenshots/dispatch.png)
+![switchyard screenshot](screenshots/dispatch.png)
 
 ## Features
 
@@ -24,35 +24,35 @@ Instead of opening every link in the same browser, htmldispatch lets you automat
 Requires Python 3.10+ and [uv](https://docs.astral.sh/uv/).
 
 ```bash
-git clone https://github.com/knobo/htmldispatch.git
-cd htmldispatch
+git clone https://github.com/knobo/switchyard.git
+cd switchyard
 uv sync
 ./install.sh
 ```
 
 This will:
 1. Install dependencies in a local `.venv`
-2. Create a wrapper script at `~/.local/bin/htmldispatch`
+2. Create a wrapper script at `~/.local/bin/switchyard`
 3. Install the `.desktop` file
-4. Set htmldispatch as the default URL handler for `http://` and `https://`
+4. Set switchyard as the default URL handler for `http://` and `https://`
 
 ## Usage
 
 URLs are dispatched automatically when you click links in other applications:
 
 ```
-htmldispatch "https://github.com/myorg/myrepo"
+switchyard "https://github.com/myorg/myrepo"
 ```
 
 Open the manager GUI to view history, edit rules, or re-dispatch URLs:
 
 ```
-htmldispatch --manage
+switchyard --manage
 ```
 
 ## Configuration
 
-Config file: `~/.config/htmldispatch/config.yaml`
+Config file: `~/.config/switchyard/config.yaml`
 
 ```yaml
 popup_on_unknown: true
@@ -114,18 +114,18 @@ Rules are evaluated top-to-bottom — first match wins.
 
 ## Dotfiles integration
 
-The config file at `~/.config/htmldispatch/config.yaml` is designed to be symlinked from your dotfiles repo. This lets you version-control your personal dispatch rules separately from this project:
+The config file at `~/.config/switchyard/config.yaml` is designed to be symlinked from your dotfiles repo. This lets you version-control your personal dispatch rules separately from this project:
 
 ```bash
 # Example: link from your dotfiles
-ln -sf ~/dotfiles/htmldispatch/config.yaml ~/.config/htmldispatch/config.yaml
+ln -sf ~/dotfiles/switchyard/config.yaml ~/.config/switchyard/config.yaml
 ```
 
-If no config file exists, htmldispatch generates a default one with example rules on first run. Edit it to add your own URL patterns and browser/profile mappings.
+If no config file exists, switchyard generates a default one with example rules on first run. Edit it to add your own URL patterns and browser/profile mappings.
 
 ## Troubleshooting
 
-### htmldispatch doesn't appear in application launcher
+### switchyard doesn't appear in application launcher
 
 Desktop files require `Version=1.0` in the `[Desktop Entry]` section for some launchers (e.g. wofi) to pick them up. Re-run `./install.sh` to get the updated desktop file, then clear your launcher cache:
 
@@ -155,7 +155,7 @@ This applies to other Electron apps too (Discord, VS Code, etc.) — clear their
 Make sure the desktop database is updated and the file has correct permissions:
 
 ```bash
-chmod 644 ~/.local/share/applications/htmldispatch.desktop
+chmod 644 ~/.local/share/applications/switchyard.desktop
 update-desktop-database ~/.local/share/applications
 ```
 
@@ -164,11 +164,11 @@ update-desktop-database ~/.local/share/applications
 ```bash
 # Check xdg default
 xdg-settings get default-web-browser
-# Should output: htmldispatch.desktop
+# Should output: switchyard.desktop
 
 # Check gio default
 gio mime x-scheme-handler/https
-# Should show: htmldispatch.desktop
+# Should show: switchyard.desktop
 
 # Test manually
 xdg-open https://example.com
@@ -177,8 +177,8 @@ xdg-open https://example.com
 ## Uninstall
 
 ```bash
-rm ~/.local/bin/htmldispatch
-rm ~/.local/share/applications/htmldispatch.desktop
+rm ~/.local/bin/switchyard
+rm ~/.local/share/applications/switchyard.desktop
 update-desktop-database ~/.local/share/applications
 xdg-settings set default-web-browser firefox.desktop
 ```

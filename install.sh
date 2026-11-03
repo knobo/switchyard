@@ -2,9 +2,12 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-DESKTOP_FILE="htmldispatch.desktop"
+DESKTOP_FILE="switchyard.desktop"
 DESKTOP_DEST="$HOME/.local/share/applications/$DESKTOP_FILE"
-BIN_LINK="$HOME/.local/bin/htmldispatch"
+BIN_LINK="$HOME/.local/bin/switchyard"
+
+# Remove the install from when this app was called htmldispatch
+rm -f "$HOME/.local/bin/htmldispatch" "$HOME/.local/share/applications/htmldispatch.desktop"
 
 # Install as editable with uv
 cd "$SCRIPT_DIR"
@@ -15,7 +18,7 @@ uv sync
 # ~/.local/bin or uv/pyenv on PATH.
 cat > "$BIN_LINK" << WRAPPER
 #!/bin/bash
-exec "$SCRIPT_DIR/.venv/bin/htmldispatch" "\$@"
+exec "$SCRIPT_DIR/.venv/bin/switchyard" "\$@"
 WRAPPER
 chmod +x "$BIN_LINK"
 
@@ -23,7 +26,7 @@ echo "Installed $BIN_LINK"
 
 # Install desktop file with absolute path to the wrapper so apps whose
 # PATH lacks ~/.local/bin (e.g. Slack/Electron) can still launch it.
-sed "s|^Exec=htmldispatch |Exec=$BIN_LINK |" "$SCRIPT_DIR/$DESKTOP_FILE" > "$DESKTOP_DEST"
+sed "s|^Exec=switchyard |Exec=$BIN_LINK |" "$SCRIPT_DIR/$DESKTOP_FILE" > "$DESKTOP_DEST"
 chmod 644 "$DESKTOP_DEST"
 
 echo "Installed $DESKTOP_DEST"
@@ -37,7 +40,7 @@ xdg-mime default "$DESKTOP_FILE" x-scheme-handler/http 2>/dev/null || true
 xdg-mime default "$DESKTOP_FILE" x-scheme-handler/https 2>/dev/null || true
 
 echo ""
-echo "htmldispatch is now the default web browser/URL handler."
+echo "switchyard is now the default web browser/URL handler."
 echo ""
-echo "Config file: ~/.config/htmldispatch/config.yaml"
-echo "Manager GUI: htmldispatch --manage"
+echo "Config file: ~/.config/switchyard/config.yaml"
+echo "Manager GUI: switchyard --manage"

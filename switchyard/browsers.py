@@ -1,6 +1,7 @@
 """Detect available browsers and Firefox profiles."""
 
 import configparser
+import json
 import shutil
 from pathlib import Path
 
@@ -46,17 +47,45 @@ def get_firefox_profile_path(profile_name):
 
 
 
+CHROME_DIRS = [
+    Path.home() / ".config/google-chrome",
+    Path.home() / "snap/chromium/common/chromium",
+]
+
+
+def get_chrome_profile_names():
+    """Return {profile directory: display name} from Chrome's Local State."""
+    names = {}
+    for chrome_dir in CHROME_DIRS:
+        try:
+            state = json.loads((chrome_dir / "Local State").read_text())
+            cache = state["profile"]["info_cache"]
+        except (OSError, ValueError, KeyError):
+            continue
+        for directory, info in cache.items():
+            names[directory] = info.get("name") or directory
+    return names
+
+
 def get_chrome_profiles():
-    """Return list of Chrome profile directory names."""
+    """Return list of Chrome profile directory names.
+
+    Only profiles Chrome itself lists in Local State, when that file exists, so
+    leftover directories of deleted profiles and the Guest/System profiles are
+    skipped.
+    """
+    known = get_chrome_profile_names()
     profiles = []
-    for chrome_dir in [
-        Path.home() / ".config/google-chrome",
-        Path.home() / "snap/chromium/common/chromium",
-    ]:
+    for chrome_dir in CHROME_DIRS:
         if chrome_dir.exists():
             for p in sorted(chrome_dir.iterdir()):
-                if p.is_dir() and (p / "Preferences").exists():
-                    profiles.append(p.name)
+                if not (p.is_dir() and (p / "Preferences").exists()):
+                    continue
+                if known and p.name not in known:
+                    continue
+                if p.name in ("Guest Profile", "System Profile"):
+                    continue
+                profiles.append(p.name)
     return profiles
 
 
