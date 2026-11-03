@@ -3,7 +3,7 @@ from pathlib import Path
 
 import yaml
 
-CONFIG_DIR = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "htmldispatch"
+CONFIG_DIR = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "switchyard"
 CONFIG_FILE = CONFIG_DIR / "config.yaml"
 HISTORY_FILE = CONFIG_DIR / "history.json"
 
@@ -34,7 +34,13 @@ DEFAULT_CONFIG = {
 }
 
 
+OLD_CONFIG_DIR = CONFIG_DIR.parent / "htmldispatch"
+
+
 def ensure_config_dir():
+    # The app used to be called htmldispatch; carry its config and history over.
+    if not CONFIG_DIR.exists() and OLD_CONFIG_DIR.is_dir():
+        OLD_CONFIG_DIR.rename(CONFIG_DIR)
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 
 
