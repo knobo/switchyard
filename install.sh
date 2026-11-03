@@ -8,6 +8,7 @@ BIN_LINK="$HOME/.local/bin/switchyard"
 
 # Remove the install from when this app was called htmldispatch
 rm -f "$HOME/.local/bin/htmldispatch" "$HOME/.local/share/applications/htmldispatch.desktop"
+rm -f "$HOME"/.local/share/icons/hicolor/*/apps/htmldispatch.*
 
 # Install as editable with uv
 cd "$SCRIPT_DIR"
@@ -24,6 +25,14 @@ chmod +x "$BIN_LINK"
 
 echo "Installed $BIN_LINK"
 
+# Install the app icon into the user icon theme (Icon=switchyard resolves here)
+ICON_DEST="$HOME/.local/share/icons/hicolor"
+mkdir -p "$ICON_DEST"
+cp -r "$SCRIPT_DIR/icons/hicolor/." "$ICON_DEST/"
+gtk-update-icon-cache -f -t "$ICON_DEST" 2>/dev/null || true
+
+echo "Installed icons in $ICON_DEST"
+
 # Install desktop file with absolute path to the wrapper so apps whose
 # PATH lacks ~/.local/bin (e.g. Slack/Electron) can still launch it.
 sed "s|^Exec=switchyard |Exec=$BIN_LINK |" "$SCRIPT_DIR/$DESKTOP_FILE" > "$DESKTOP_DEST"
@@ -38,6 +47,12 @@ update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
 xdg-settings set default-web-browser "$DESKTOP_FILE" 2>/dev/null || true
 xdg-mime default "$DESKTOP_FILE" x-scheme-handler/http 2>/dev/null || true
 xdg-mime default "$DESKTOP_FILE" x-scheme-handler/https 2>/dev/null || true
+
+# claude:// deep links carry no hint about which browser profile you clicked
+# them from, so route them through the dispatcher to pick a Claude profile.
+if command -v claude-desktop >/dev/null 2>&1; then
+    xdg-mime default "$DESKTOP_FILE" x-scheme-handler/claude 2>/dev/null || true
+fi
 
 echo ""
 echo "switchyard is now the default web browser/URL handler."

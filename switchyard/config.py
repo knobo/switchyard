@@ -11,7 +11,19 @@ DEFAULT_CONFIG = {
     "popup_on_unknown": True,
     "default_browser": "firefox",
     "default_profile": None,
+    # Claude Desktop profiles. Omit this section to auto-discover them from
+    # ~/.config/Claude-<name> directories. "default" is the app's own profile.
+    "claude_profiles": {
+        "default": {},
+    },
     "rules": [
+        {
+            "name": "Claude Desktop",
+            "pattern": r"^claude://",
+            "browser": "claude",
+            "profile": "default",
+            "confirm": True,
+        },
         {
             "name": "Work GitHub",
             "pattern": r"https?://github\.com/myorg",
