@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""HTML Dispatch - URL dispatcher for Linux."""
+"""Switchyard - URL dispatcher for Linux."""
 
 import argparse
 import sys
@@ -9,7 +9,7 @@ from .gui import DispatcherApp
 
 
 def main():
-    parser = argparse.ArgumentParser(description="HTML Dispatch - URL router for Linux")
+    parser = argparse.ArgumentParser(description="Switchyard - URL router for Linux")
     parser.add_argument("url", nargs="?", help="URL to dispatch")
     parser.add_argument(
         "--manage", action="store_true", help="Open manager GUI (history, rules, settings)"

@@ -1,5 +1,5 @@
 [project]
-name = "htmldispatch"
+name = "switchyard"
 version = "0.1.0"
 description = "URL dispatcher for Linux - routes URLs to the right browser and profile"
 requires-python = ">=3.10"
@@ -9,7 +9,7 @@ dependencies = [
 ]
 
 [project.scripts]
-htmldispatch = "htmldispatch.main:main"
+switchyard = "switchyard.main:main"
 
 [build-system]
 requires = ["hatchling"]
