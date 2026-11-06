@@ -18,7 +18,7 @@ Instead of opening every link in the same browser, switchyard lets you automatic
 - **History log** — tracks all dispatched URLs with timestamps
 - **Re-dispatch** — open the manager, pick a URL from history, and send it to a different browser
 - **YAML config** — edit rules by hand or through the GUI
-- **Keyboard shortcuts** — Ctrl+Enter to open, Ctrl+Space to auto-dispatch, Esc to cancel
+- **Keyboard-driven** — Enter to open, 1–9 to pick a destination, Ctrl+Space to auto-dispatch, Esc to cancel
 
 ## Install
 
@@ -137,7 +137,9 @@ Leave out `claude_profiles` entirely and profiles are auto-discovered from
 
 | Key | Action |
 |-----|--------|
-| `Ctrl+Enter` | Open with selected browser/profile |
+| `Enter` | Open with selected browser/profile |
+| `1`–`9` | Pick a destination |
+| `Left/Right` | Move between destinations |
 | `Ctrl+Space` | Auto-dispatch using fallback chain |
 | `Up/Down` | Cycle through history destinations |
 | `Esc` | Cancel |
